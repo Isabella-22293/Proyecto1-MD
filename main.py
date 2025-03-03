@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from split_data import split_data, compare_distribution  # Importa desde el archivo split_data.py
+from split_data import split_data, compare_distribution  
+from feature_engineering import feature_engineering
 
 # Estilos de gráficos y reproducibilidad
 sns.set(style="whitegrid")
@@ -80,17 +81,23 @@ def preprocessing(data):
 def main():
     file_path = 'train.csv'
     data = load_data(file_path)
+
     print("### Visión General de los Datos ###")
     data_overview(data)
+
+    print("\n### Aplicando Ingeniería de Características ###")
+    data = feature_engineering(data)
+    
     print("\n### Visualizaciones ###")
     plot_histograms(data)
     plot_boxplot(data)
     plot_correlation_matrix(data)
     plot_scatter(data)
+
     print("\n### Preprocesamiento de los Datos ###")
     data_preprocessed = preprocessing(data)
     print("Preprocesamiento completado. Nuevas dimensiones:", data_preprocessed.shape)
-    
+
     print("\n### División del Conjunto de Datos ###")
     train_data, test_data = split_data(data_preprocessed)
     compare_distribution(train_data, test_data)
