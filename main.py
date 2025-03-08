@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from split_data import split_data, compare_distribution  
 from feature_engineering import feature_engineering
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from evaluation import evaluate_model
 
 # Estilos de gráficos y reproducibilidad
 sns.set(style="whitegrid")
@@ -25,7 +28,7 @@ def data_overview(data):
 
 # Visualizaciones
 def plot_histograms(data):
-    #Histogramas y diagramas de densidad para las variables clave
+    # Histogramas y diagramas de densidad para las variables clave
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
@@ -40,7 +43,7 @@ def plot_histograms(data):
     plt.show()
 
 def plot_boxplot(data):
-    #Boxplot para detectar outliers
+    # Boxplot para detectar outliers
     plt.figure(figsize=(10, 5))
     sns.boxplot(x=data['SalePrice'])
     plt.title('Boxplot de SalePrice')
@@ -56,9 +59,8 @@ def plot_correlation_matrix(data):
     plt.title('Matriz de Correlación')
     plt.show()
 
-
 def plot_scatter(data):
-    #Diagrama de dispersión entre GrLivArea y SalePrice
+    # Diagrama de dispersión entre GrLivArea y SalePrice
     plt.figure(figsize=(8, 6))
     sns.scatterplot(x='GrLivArea', y='SalePrice', data=data)
     plt.title('GrLivArea vs SalePrice')
@@ -101,6 +103,21 @@ def main():
     print("\n### División del Conjunto de Datos ###")
     train_data, test_data = split_data(data_preprocessed)
     compare_distribution(train_data, test_data)
+
+    print("\n### Entrenamiento y Evaluación del Modelo ###")
+    numeric_cols = data_preprocessed.select_dtypes(include=[np.number]).columns.tolist()
+    for col in ['SalePrice', 'SalePrice_log']:
+        if col in numeric_cols:
+            numeric_cols.remove(col)
+    X = data_preprocessed[numeric_cols]
+    y = data_preprocessed['SalePrice_log']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model_lr = LinearRegression()
+    model_lr.fit(X_train, y_train)
+
+    evaluate_model(model_lr, X_test, y_test)
     
 if __name__ == "__main__":
     main()
