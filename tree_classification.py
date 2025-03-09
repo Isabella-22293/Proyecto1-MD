@@ -1,3 +1,4 @@
+# tree_classification.py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +15,8 @@ sns.set(style="whitegrid")
 np.random.seed(42)
 
 def preprocessing_for_classification(df):
-    df = create_price_category(df)    
+    df = create_price_category(df)
+    
     for col in ['SalePrice', 'SalePrice_log']:
         if col in df.columns:
             df = df.drop(columns=[col])
@@ -30,24 +32,20 @@ def preprocessing_for_classification(df):
 def main():
     file_path = 'train.csv'
     df = pd.read_csv(file_path)    
-    df = preprocessing_for_classification(df)
-    
-    # Separar las variables predictoras y la variable respuesta
+    df = preprocessing_for_classification(df)    
     X = df.drop('PriceCategory', axis=1)
-    y = df['PriceCategory']
-    
-    # Dividir el conjunto en entrenamiento y prueba utilizando split_data
+    y = df['PriceCategory']    
     train_data, test_data = split_data(df)
     X_train = train_data.drop('PriceCategory', axis=1)
     y_train = train_data['PriceCategory']
     X_test = test_data.drop('PriceCategory', axis=1)
     y_test = test_data['PriceCategory']
     
-    # Entrenar el árbol de clasificación
-    clf = DecisionTreeClassifier(random_state=42, max_depth=5)  # Se limita la profundidad para evitar sobreajuste
+    # Entrenar el árbol de clasificación (se usa un max_depth de 5, ajustable según requerimientos)
+    clf = DecisionTreeClassifier(random_state=42, max_depth=5)
     clf.fit(X_train, y_train)
     
-    # Predicciones y evaluación
+    # Realizar predicciones y evaluar la eficiencia con el conjunto de prueba
     y_pred = clf.predict(X_test)
     acc = accuracy_score(y_test, y_pred)
     print("Exactitud del modelo de clasificación: {:.4f}".format(acc))
